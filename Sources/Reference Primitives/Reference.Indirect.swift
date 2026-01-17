@@ -109,7 +109,7 @@ extension Reference {
 // Indirect is intentionally NOT Sendable.
 // Use Reference.Indirect.Unchecked for explicit opt-in to cross-isolation transfer.
 
-extension Reference.Indirect {
+extension Reference.Indirect where Value: ~Copyable {
     /// An unchecked-Sendable wrapper for `Indirect` that allows crossing
     /// concurrency boundaries with any value.
     ///
