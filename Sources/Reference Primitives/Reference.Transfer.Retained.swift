@@ -64,8 +64,9 @@ extension Reference.Transfer {
         ///
         /// - Parameter instance: The object to retain.
         @inlinable
+        @unsafe
         public init(_ instance: T) {
-            self.raw = unsafe Unmanaged.passRetained(instance).toOpaque()
+            unsafe (self.raw = Unmanaged.passRetained(instance).toOpaque())
         }
 
         /// Takes ownership of the retained object, decrementing the retain count.

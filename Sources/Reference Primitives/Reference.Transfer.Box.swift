@@ -86,7 +86,8 @@ extension Reference.Transfer.Box {
     @safe
     public struct Pointer: @unchecked Sendable {
         public let raw: UnsafeMutableRawPointer
-        public init(_ raw: UnsafeMutableRawPointer) { self.raw = raw }
+        @unsafe
+        public init(_ raw: UnsafeMutableRawPointer) { unsafe (self.raw = raw) }
     }
 }
 
