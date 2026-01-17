@@ -142,7 +142,7 @@ extension Reference {
 
 // MARK: - Store Result
 
-extension Reference.Slot {
+extension Reference.Slot where Value: ~Copyable {
     /// Result of a total store operation.
     ///
     /// For `~Copyable` values, this enum ensures the value is never silently
@@ -174,7 +174,7 @@ extension Reference.Slot {
 
 // MARK: - Store Operations
 
-extension Reference.Slot {
+extension Reference.Slot where Value: ~Copyable {
     /// Atomically stores a value into the slot.
     ///
     /// This is the primary, total store operation. If the slot is occupied,
@@ -219,7 +219,7 @@ extension Reference.Slot {
 
 // MARK: - Take Operations
 
-extension Reference.Slot {
+extension Reference.Slot where Value: ~Copyable {
     /// Atomically takes the value from the slot if present.
     ///
     /// This is the primary, total take operation.
@@ -254,7 +254,7 @@ extension Reference.Slot {
 
 // MARK: - Move Accessor
 
-extension Reference.Slot {
+extension Reference.Slot where Value: ~Copyable {
     /// Accessor for move operations using fluent syntax.
     ///
     /// Provides `slot.move.in(value)` and `slot.move.out` as alternatives
@@ -266,7 +266,7 @@ extension Reference.Slot {
 
 // MARK: - Move Type
 
-extension Reference.Slot {
+extension Reference.Slot where Value: ~Copyable {
     /// Namespace for fluent value move operations.
     ///
     /// These operations trap on failure—use the total `store(_:)` and `take()`
@@ -284,7 +284,7 @@ extension Reference.Slot {
 
 // MARK: - Move Operations
 
-extension Reference.Slot.Move {
+extension Reference.Slot.Move where Value: ~Copyable {
     /// Takes the value out of the slot.
     ///
     /// - Precondition: Slot must be occupied.
