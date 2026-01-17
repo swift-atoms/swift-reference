@@ -83,6 +83,7 @@ extension Reference.Transfer.Box {
     /// This is the only `@unchecked Sendable` in the box internals.
     /// It represents a capability to consume or destroy a box, and
     /// concentrates the unsafe sendability at the boundary.
+    @safe
     public struct Pointer: @unchecked Sendable {
         public let raw: UnsafeMutableRawPointer
         public init(_ raw: UnsafeMutableRawPointer) { self.raw = raw }
@@ -119,11 +120,11 @@ extension Reference.Transfer.Box {
         )
 
         // Store header at start (includes payloadOffset for destroy)
-        let headerPtr = ptr.assumingMemoryBound(to: Header.self)
-        headerPtr.initialize(
+        let headerPtr = unsafe ptr.assumingMemoryBound(to: Header.self)
+        unsafe headerPtr.initialize(
             to: Header(
                 destroyPayload: { base, offset in
-                    (base + offset).assumingMemoryBound(to: Result<T, E>.self)
+                    unsafe (base + offset).assumingMemoryBound(to: Result<T, E>.self)
                         .deinitialize(count: 1)
                 },
                 payloadOffset: payloadOffset
@@ -131,10 +132,10 @@ extension Reference.Transfer.Box {
         )
 
         // Store payload at aligned offset
-        let payloadPtr = (ptr + payloadOffset).assumingMemoryBound(to: Result<T, E>.self)
-        payloadPtr.initialize(to: result)
+        let payloadPtr = unsafe (ptr + payloadOffset).assumingMemoryBound(to: Result<T, E>.self)
+        unsafe payloadPtr.initialize(to: result)
 
-        return ptr
+        return unsafe ptr
     }
 
     /// Unbox and deallocate a Result.
@@ -144,12 +145,12 @@ extension Reference.Transfer.Box {
     public static func take<T: Sendable, E: Swift.Error & Sendable>(
         _ ptr: UnsafeMutableRawPointer
     ) -> Result<T, E> {
-        let headerPtr = ptr.assumingMemoryBound(to: Header.self)
-        let header = headerPtr.move()  // releases closure
-        let payloadPtr = (ptr + header.payloadOffset).assumingMemoryBound(to: Result<T, E>.self)
-        let result = payloadPtr.move()
+        let headerPtr = unsafe ptr.assumingMemoryBound(to: Header.self)
+        let header = unsafe headerPtr.move()  // releases closure
+        let payloadPtr = unsafe (ptr + header.payloadOffset).assumingMemoryBound(to: Result<T, E>.self)
+        let result = unsafe payloadPtr.move()
         // Single deallocation for entire box
-        ptr.deallocate()
+        unsafe ptr.deallocate()
         // destroyPayload not called - we moved the payload out instead
         return result
     }
@@ -185,11 +186,11 @@ extension Reference.Transfer.Box {
         )
 
         // Store header at start (includes payloadOffset for destroy)
-        let headerPtr = ptr.assumingMemoryBound(to: Header.self)
-        headerPtr.initialize(
+        let headerPtr = unsafe ptr.assumingMemoryBound(to: Header.self)
+        unsafe headerPtr.initialize(
             to: Header(
                 destroyPayload: { base, offset in
-                    (base + offset).assumingMemoryBound(to: T.self)
+                    unsafe (base + offset).assumingMemoryBound(to: T.self)
                         .deinitialize(count: 1)
                 },
                 payloadOffset: payloadOffset
@@ -197,10 +198,10 @@ extension Reference.Transfer.Box {
         )
 
         // Store payload at aligned offset
-        let payloadPtr = (ptr + payloadOffset).assumingMemoryBound(to: T.self)
-        payloadPtr.initialize(to: value)
+        let payloadPtr = unsafe (ptr + payloadOffset).assumingMemoryBound(to: T.self)
+        unsafe payloadPtr.initialize(to: value)
 
-        return ptr
+        return unsafe ptr
     }
 
     /// Unbox and deallocate a value.
@@ -210,12 +211,12 @@ extension Reference.Transfer.Box {
     public static func takeValue<T: Sendable>(
         _ ptr: UnsafeMutableRawPointer
     ) -> T {
-        let headerPtr = ptr.assumingMemoryBound(to: Header.self)
-        let header = headerPtr.move()  // releases closure
-        let payloadPtr = (ptr + header.payloadOffset).assumingMemoryBound(to: T.self)
-        let result = payloadPtr.move()
+        let headerPtr = unsafe ptr.assumingMemoryBound(to: Header.self)
+        let header = unsafe headerPtr.move()  // releases closure
+        let payloadPtr = unsafe (ptr + header.payloadOffset).assumingMemoryBound(to: T.self)
+        let result = unsafe payloadPtr.move()
         // Single deallocation for entire box
-        ptr.deallocate()
+        unsafe ptr.deallocate()
         return result
     }
 }
@@ -231,10 +232,10 @@ extension Reference.Transfer.Box {
     /// - Important: Uses `move()` on Header before deallocate to properly
     ///   release the closure and balance the initialization from `make()`.
     public static func destroy(_ ptr: UnsafeMutableRawPointer) {
-        let headerPtr = ptr.assumingMemoryBound(to: Header.self)
-        let header = headerPtr.move()  // releases closure
-        header.destroyPayload(ptr, header.payloadOffset)
+        let headerPtr = unsafe ptr.assumingMemoryBound(to: Header.self)
+        let header = unsafe headerPtr.move()  // releases closure
+        unsafe header.destroyPayload(ptr, header.payloadOffset)
         // Single deallocation for entire box
-        ptr.deallocate()
+        unsafe ptr.deallocate()
     }
 }

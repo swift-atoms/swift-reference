@@ -65,7 +65,7 @@ extension Reference.Transfer {
         /// - Parameter instance: The object to retain.
         @inlinable
         public init(_ instance: T) {
-            self.raw = Unmanaged.passRetained(instance).toOpaque()
+            self.raw = unsafe Unmanaged.passRetained(instance).toOpaque()
         }
 
         /// Takes ownership of the retained object, decrementing the retain count.
@@ -75,7 +75,7 @@ extension Reference.Transfer {
         /// - Returns: The retained object. The caller now owns this reference.
         @inlinable
         public consuming func take() -> T {
-            Unmanaged<T>.fromOpaque(raw).takeRetainedValue()
+            unsafe Unmanaged<T>.fromOpaque(raw).takeRetainedValue()
         }
     }
 }

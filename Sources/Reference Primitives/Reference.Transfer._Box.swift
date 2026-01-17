@@ -94,7 +94,7 @@ extension Reference.Transfer {
             _state = Atomic(State.initializing)
             let p = unsafe UnsafeMutablePointer<T>.allocate(capacity: 1)
             unsafe p.initialize(to: value)
-            _storage = p
+            _storage = unsafe p
             _state.store(State.full, ordering: .releasing)
         }
 
@@ -125,7 +125,7 @@ extension Reference.Transfer {
             // Allocate and initialize
             let p = unsafe UnsafeMutablePointer<T>.allocate(capacity: 1)
             unsafe p.initialize(to: value)
-            _storage = p
+            _storage = unsafe p
 
             // Publish: store full (release ensures init is visible to takers)
             _state.store(State.full, ordering: .releasing)
@@ -148,7 +148,7 @@ extension Reference.Transfer {
                 }
             }
 
-            let p = _storage!
+            let p = unsafe _storage!
             _storage = nil
             let value = unsafe p.move()
             unsafe p.deallocate()
@@ -168,7 +168,7 @@ extension Reference.Transfer {
                 return nil
             }
 
-            let p = _storage!
+            let p = unsafe _storage!
             _storage = nil
             let value = unsafe p.move()
             unsafe p.deallocate()
