@@ -17,6 +17,7 @@ extension Reference {
     /// - Heap allocation for values that need stable identity
     /// - Type erasure via `Unmanaged` + `UnsafeRawPointer`
     /// - Breaking recursive type definitions
+    /// - Storage for `~Copyable` types that need heap allocation
     ///
     /// ## Example
     ///
@@ -25,13 +26,13 @@ extension Reference {
     /// print(boxed.value)  // 42
     /// ```
     @safe
-    public final class Box<Value: Sendable>: @unchecked Sendable {
+    public final class Box<Value: ~Copyable & Sendable>: @unchecked Sendable {
         /// The wrapped value.
         public let value: Value
 
         /// Creates a box containing the given value.
         @inlinable
-        public init(_ value: Value) {
+        public init(_ value: consuming Value) {
             self.value = value
         }
     }
