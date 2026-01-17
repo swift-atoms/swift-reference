@@ -74,11 +74,24 @@ extension Reference {
     public final class Slot<Value: ~Copyable & Sendable>: @unchecked Sendable {
         // MARK: - State Machine
         //
-        // Publication invariant: State.full implies storage is initialized
-        // and safe to move/deinitialize.
+        // ## Publication Protocol (release/acquire)
         //
-        // Intermediate state semantics: State.initializing is transient and
-        // must not be observable as "takeable" or "storable".
+        // Store path:
+        //   1. CAS empty → initializing (acquiringAndReleasing) — reserves slot
+        //   2. _storage.initialize(to:) — writes non-atomic memory
+        //   3. store(State.full, releasing) — publishes; release barrier ensures
+        //      initialize happens-before any observer sees .full
+        //
+        // Take path:
+        //   1. CAS full → empty (acquiringAndReleasing) — acquire barrier ensures
+        //      we observe all writes that happened-before the release in store
+        //   2. _storage.move() — safe because we acquired the publication
+        //
+        // ## Invariants
+        //
+        // - State.full implies _storage is initialized and safe to move/deinit
+        // - State.initializing is transient; no observer can take until .full
+        // - _storage is non-atomic; all access is serialized by state transitions
         //
         // States:
         // - State.empty (0): storage uninitialized

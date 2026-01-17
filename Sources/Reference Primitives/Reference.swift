@@ -21,11 +21,11 @@
 /// | Type | Ownership | Mutability | Sendable |
 /// |------|-----------|------------|----------|
 /// | ``Box`` | Strong | Immutable | When `Value: Sendable` |
-/// | ``Indirect`` | Strong | Mutable | When `Value: Sendable` |
+/// | ``Indirect`` | Strong | Mutable | Not Sendable (use `.Unchecked`) |
 /// | ``Weak`` | Weak | N/A | When `Object: Sendable` |
-/// | ``Unowned`` | Unowned | N/A | `@unchecked` |
-/// | ``Slot`` | Strong | Move semantics | `@unchecked` |
-/// | ``Transfer`` | One-shot | Move-only | Sendable |
+/// | ``Unowned`` | Unowned | N/A | Not Sendable (use `.Sendable.*`) |
+/// | ``Slot`` | Strong | Move semantics | `@unchecked` (atomic sync) |
+/// | ``Transfer`` | One-shot | Move-only | Tokens are Sendable |
 ///
 /// ## Design Philosophy
 ///
@@ -40,8 +40,23 @@
 ///
 /// ## Sendable Policy
 ///
-/// Default wrapper types are Sendable only when their payload is Sendable.
-/// Only explicitly-unsafe types (named `Unchecked` or `Unsafe`) may be
-/// `@unchecked Sendable` for mutable shared state. This prevents
-/// "just add unchecked Sendable to make it compile" regressions.
+/// **Principle:** Mutable reference wrappers are NOT Sendable by default.
+/// Crossing isolation boundaries requires explicit opt-in.
+///
+/// ### Immutable types
+/// - `Box`: Sendable when `Value: Sendable` (immutable, safe to share)
+/// - `Weak`: Sendable when `Object: Sendable` (value semantics)
+///
+/// ### Mutable types (not Sendable by default)
+/// - `Indirect`: Not Sendable. Use `Indirect.Unchecked` for explicit opt-in.
+/// - `Unowned`: Not Sendable. Use `Unowned.Sendable.Checked` (compiler-verified)
+///   or `Unowned.Sendable.Unchecked` (explicit escape hatch).
+///
+/// ### Synchronized types
+/// - `Slot`: `@unchecked Sendable` because atomic state machine provides
+///   synchronization. Safe publication via release/acquire on state transitions.
+/// - `Transfer`: Tokens are Sendable. Exactly-once semantics enforced atomically.
+///
+/// This policy prevents "just add @unchecked Sendable to make it compile"
+/// regressions while providing explicit, auditable opt-ins where needed.
 public enum Reference {}

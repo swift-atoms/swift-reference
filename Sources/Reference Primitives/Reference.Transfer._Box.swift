@@ -50,6 +50,26 @@ extension Reference.Transfer {
     internal final class _Box<T: ~Copyable>: @unchecked Sendable {
         // MARK: - State Machine
         //
+        // ## Publication Protocol (release/acquire)
+        //
+        // Store path:
+        //   1. CAS empty → initializing (acquiringAndReleasing) — reserves box
+        //   2. allocate + initialize _storage — writes non-atomic memory
+        //   3. store(State.full, releasing) — publishes; release barrier ensures
+        //      allocation/init happens-before any observer sees .full
+        //
+        // Take path:
+        //   1. CAS full → taken (acquiringAndReleasing) — acquire barrier ensures
+        //      we observe all writes that happened-before the release in store
+        //   2. _storage!.move() + deallocate — safe because we acquired publication
+        //
+        // ## Invariants
+        //
+        // - State.full implies _storage is non-nil, allocated, and initialized
+        // - State.initializing is transient; no observer can take until .full
+        // - State.taken is terminal; no further operations allowed
+        // - _storage is non-atomic; all access is serialized by state transitions
+        //
         // States:
         // - State.empty (0): no storage allocated
         // - State.initializing (1): exclusive writer reserved; allocation/init in progress
