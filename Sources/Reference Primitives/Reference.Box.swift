@@ -11,13 +11,25 @@
 // ===----------------------------------------------------------------------===//
 
 extension Reference {
-    /// A heap-allocated wrapper for a value.
+    /// A heap-allocated wrapper for an immutable value.
     ///
     /// `Box` provides reference semantics for value types, enabling:
     /// - Heap allocation for values that need stable identity
     /// - Type erasure via `Unmanaged` + `UnsafeRawPointer`
     /// - Breaking recursive type definitions
     /// - Storage for `~Copyable` types that need heap allocation
+    ///
+    /// ## Sendable
+    ///
+    /// `Box` is `Sendable` when `Value: Sendable`. The value is immutable (`let`),
+    /// so sharing across isolation domains is safe.
+    ///
+    /// **Note:** This type uses `@unchecked Sendable` due to a Swift compiler
+    /// limitation where `~Copyable` generic parameters in class stored properties
+    /// prevent checked `Sendable` conformance inference. The type is structurally
+    /// safe: the stored `value` is immutable and requires `Value: Sendable`.
+    /// When this compiler limitation is resolved, this should be converted to
+    /// checked `Sendable` conformance.
     ///
     /// ## Example
     ///

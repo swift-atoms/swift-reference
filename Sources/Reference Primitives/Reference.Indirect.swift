@@ -38,6 +38,20 @@ extension Reference {
     /// `Indirect` itself provides no synchronization. If the boxed value needs
     /// thread-safe access, wrap a synchronized type (e.g., `Mutex`).
     ///
+    /// ## Sendable
+    ///
+    /// `Indirect` is **not** `Sendable` by design. It is an identity-sharing mutable
+    /// reference wrapper without synchronization. Sending it across isolation domains
+    /// would allow concurrent mutation without protection—a data race.
+    ///
+    /// For use cases requiring capture of values in `@Sendable` closures (e.g., async
+    /// iterator boxing), use ``Unchecked`` instead. This is an explicit opt-in to
+    /// bypass Sendable checking—you take responsibility for ensuring single-consumer
+    /// or externally-synchronized access.
+    ///
+    /// **Policy:** No general-purpose mutable reference wrapper in this module is
+    /// `Sendable` unless it provides synchronization or actor isolation by construction.
+    ///
     /// ## Example
     ///
     /// ```swift
@@ -92,30 +106,42 @@ extension Reference {
     }
 }
 
-// Conditionally Sendable: preserves compile-time safety for the common case.
-// For use cases requiring capture of non-Sendable values in @Sendable closures
-// (e.g., async iterator boxing), use Reference.Indirect.Unchecked instead.
-extension Reference.Indirect: @unchecked Sendable where Value: Sendable {}
+// Indirect is intentionally NOT Sendable.
+// Use Reference.Indirect.Unchecked for explicit opt-in to cross-isolation transfer.
 
 extension Reference.Indirect {
     /// An unchecked-Sendable wrapper for `Indirect` that allows crossing
-    /// concurrency boundaries with non-Sendable values.
+    /// concurrency boundaries with any value.
     ///
-    /// **Use with caution.** This type bypasses the compiler's Sendable checking.
-    /// You are responsible for ensuring that concurrent access is properly synchronized.
+    /// ## Safety
+    ///
+    /// **This type bypasses the compiler's Sendable checking.**
+    ///
+    /// - **Single-consumer only.** Do not capture in multiple concurrent tasks.
+    /// - **NOT thread-safe.** You are responsible for ensuring proper synchronization.
+    /// - Concurrent mutation will cause data races (no runtime trap, silent corruption).
     ///
     /// ## Intended Use Cases
     ///
     /// - Boxing non-Sendable async iterators for capture in `@Sendable` closures
-    /// - Single-writer/multiple-reader patterns with external synchronization
+    /// - Single-writer patterns where the writer is the only accessor
+    /// - Actor-confined usage where the wrapper never escapes the actor
     ///
     /// ## Example
     ///
     /// ```swift
-    /// let box = Reference.Indirect.Unchecked(nonSendableIterator)
+    /// // CORRECT: Single consumer
+    /// let box = Reference.Indirect.Unchecked(asyncIterator)
     /// Task {
-    ///     await box.indirect.value.next()
+    ///     while let value = await box.indirect.value.next() {
+    ///         process(value)
+    ///     }
     /// }
+    ///
+    /// // INCORRECT: Multiple consumers — DATA RACE
+    /// let box = Reference.Indirect.Unchecked(asyncIterator)
+    /// Task { await box.indirect.value.next() }  // Race!
+    /// Task { await box.indirect.value.next() }  // Race!
     /// ```
     public struct Unchecked: @unchecked Sendable {
         /// The wrapped `Indirect` instance.
