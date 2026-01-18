@@ -26,6 +26,7 @@
 /// | ``Unowned`` | Unowned | N/A | Not Sendable (use `.Sendable.*`) |
 /// | ``Slot`` | Strong | Move semantics | `@unchecked` (atomic sync) |
 /// | ``Transfer`` | One-shot | Move-only | Tokens are Sendable |
+/// | ``Sendability.Unchecked`` | N/A | Immutable | `@unchecked` (assertion) |
 ///
 /// ## Design Philosophy
 ///
@@ -37,6 +38,7 @@
 /// - Need weak back-references? → ``Weak``
 /// - Need atomic move semantics? → ``Slot``
 /// - Need cross-boundary ownership transfer? → ``Transfer``
+/// - Need unchecked sendability assertion? → ``Sendability.Unchecked``
 ///
 /// ## Sendable Policy
 ///
@@ -56,6 +58,11 @@
 /// - `Slot`: `@unchecked Sendable` because atomic state machine provides
 ///   synchronization. Safe publication via release/acquire on state transitions.
 /// - `Transfer`: Tokens are Sendable. Exactly-once semantics enforced atomically.
+///
+/// ### Escape hatches
+/// - `Sendability.Unchecked`: Wraps any value as `@unchecked Sendable`. Provides
+///   no guarantees—exists solely as an auditable assertion site for values the
+///   compiler cannot prove sendable but the programmer can reason about.
 ///
 /// This policy prevents "just add @unchecked Sendable to make it compile"
 /// regressions while providing explicit, auditable opt-ins where needed.
