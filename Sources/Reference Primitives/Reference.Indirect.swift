@@ -86,10 +86,11 @@ extension Reference {
         ///
         /// - Parameter body: A closure that receives the value.
         /// - Returns: The result of the closure.
+        /// - Throws: Rethrows any error thrown by the closure, preserving the exact error type.
         @inlinable
-        public func withValue<Result>(
-            _ body: (borrowing Value) throws -> Result
-        ) rethrows -> Result {
+        public func withValue<Result, E: Error>(
+            _ body: (borrowing Value) throws(E) -> Result
+        ) throws(E) -> Result {
             try body(_value)
         }
 
@@ -97,10 +98,11 @@ extension Reference {
         ///
         /// - Parameter body: A closure that receives an inout reference to the value.
         /// - Returns: The result of the closure.
+        /// - Throws: Rethrows any error thrown by the closure, preserving the exact error type.
         @inlinable
-        public func update<Result>(
-            _ body: (inout Value) throws -> Result
-        ) rethrows -> Result {
+        public func update<Result, E: Error>(
+            _ body: (inout Value) throws(E) -> Result
+        ) throws(E) -> Result {
             try body(&_value)
         }
     }
