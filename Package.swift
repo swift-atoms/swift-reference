@@ -17,9 +17,15 @@ let package = Package(
             targets: ["Reference Primitives"]
         ),
     ],
+    dependencies: [
+        .package(path: "../swift-pointer-primitives"),
+    ],
     targets: [
         .target(
             name: "Reference Primitives",
+            dependencies: [
+                .product(name: "Pointer Primitives", package: "swift-pointer-primitives"),
+            ],
             swiftSettings: [
                 .strictMemorySafety()
             ]

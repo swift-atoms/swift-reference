@@ -10,6 +10,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
+public import Pointer_Primitives
 import Synchronization
 
 // MARK: - Hoisted State Constants
@@ -86,13 +87,13 @@ extension Reference.Transfer {
         /// Storage for the value. Access protected by _state transitions.
         /// Non-nil only when state is State.full.
         @usableFromInline
-        var _storage: UnsafeMutablePointer<T>?
+        var _storage: Pointer<T>.Mutable?
 
         /// Creates a box containing a value.
         @usableFromInline
         init(_ value: consuming T) {
             _state = Atomic(State.initializing)
-            let p = unsafe UnsafeMutablePointer<T>.allocate(capacity: 1)
+            let p = unsafe Pointer<T>.Mutable.allocate(capacity: Index<T>.Count(__unchecked: 1))
             unsafe p.initialize(to: value)
             unsafe (_storage = p)
             _state.store(State.full, ordering: .releasing)
@@ -123,7 +124,7 @@ extension Reference.Transfer {
             }
 
             // Allocate and initialize
-            let p = unsafe UnsafeMutablePointer<T>.allocate(capacity: 1)
+            let p = unsafe Pointer<T>.Mutable.allocate(capacity: Index<T>.Count(__unchecked: 1))
             unsafe p.initialize(to: value)
             unsafe (_storage = p)
 
@@ -185,7 +186,7 @@ extension Reference.Transfer {
             let state = _state.load(ordering: .acquiring)
             if state == State.full, let p = unsafe _storage {
                 // Value was never taken - clean up to avoid memory leak
-                unsafe p.deinitialize(count: 1)
+                _ = unsafe p.deinitialize(count: Index<T>.Count(__unchecked: 1))
                 unsafe p.deallocate()
             }
             // State.initializing at deinit indicates a logic bug (store in progress

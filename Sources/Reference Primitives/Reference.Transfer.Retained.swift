@@ -10,6 +10,8 @@
 //
 // ===----------------------------------------------------------------------===//
 
+public import Pointer_Primitives
+
 extension Reference.Transfer {
     /// A move-only Sendable wrapper for transferring retained object ownership
     /// across thread boundaries with zero allocation overhead.
@@ -58,7 +60,7 @@ extension Reference.Transfer {
         /// This is NOT a pointer to be manipulated - it is an ownership token
         /// that must be round-tripped back via `take()`.
         @usableFromInline
-        let raw: UnsafeMutableRawPointer
+        let raw: Memory.Address.Mutable
 
         /// Creates a retained pointer wrapper, incrementing the object's retain count.
         ///
@@ -66,7 +68,7 @@ extension Reference.Transfer {
         @inlinable
         @unsafe
         public init(_ instance: T) {
-            unsafe (self.raw = Unmanaged.passRetained(instance).toOpaque())
+            unsafe (self.raw = Memory.Address.Mutable(Unmanaged.passRetained(instance).toOpaque()))
         }
 
         /// Takes ownership of the retained object, decrementing the retain count.
@@ -76,7 +78,7 @@ extension Reference.Transfer {
         /// - Returns: The retained object. The caller now owns this reference.
         @inlinable
         public consuming func take() -> T {
-            unsafe Unmanaged<T>.fromOpaque(raw).takeRetainedValue()
+            unsafe Unmanaged<T>.fromOpaque(raw.rawPointer).takeRetainedValue()
         }
     }
 }
