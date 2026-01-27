@@ -93,7 +93,7 @@ extension Reference.Transfer {
         @usableFromInline
         init(_ value: consuming T) {
             _state = Atomic(State.initializing)
-            let p = unsafe Pointer<T>.Mutable.allocate(capacity: Index<T>.Count(__unchecked: 1))
+            let p = unsafe Pointer<T>.Mutable.allocate(capacity: Index<T>.Count(__unchecked: (), 1))
             unsafe p.initialize(to: value)
             unsafe (_storage = p)
             _state.store(State.full, ordering: .releasing)
@@ -124,7 +124,7 @@ extension Reference.Transfer {
             }
 
             // Allocate and initialize
-            let p = unsafe Pointer<T>.Mutable.allocate(capacity: Index<T>.Count(__unchecked: 1))
+            let p = unsafe Pointer<T>.Mutable.allocate(capacity: Index<T>.Count(__unchecked: (), 1))
             unsafe p.initialize(to: value)
             unsafe (_storage = p)
 
@@ -186,7 +186,7 @@ extension Reference.Transfer {
             let state = _state.load(ordering: .acquiring)
             if state == State.full, let p = unsafe _storage {
                 // Value was never taken - clean up to avoid memory leak
-                _ = unsafe p.deinitialize(count: Index<T>.Count(__unchecked: 1))
+                _ = unsafe p.deinitialize(count: Index<T>.Count(__unchecked: (), 1))
                 unsafe p.deallocate()
             }
             // State.initializing at deinit indicates a logic bug (store in progress

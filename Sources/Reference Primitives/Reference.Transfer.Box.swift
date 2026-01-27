@@ -115,20 +115,20 @@ extension Reference.Transfer.Box {
         // Align payload offset properly
         let payloadOffsetRaw = (headerSize + payloadAlignment - 1) & ~(payloadAlignment - 1)
         let payloadOffset = Index<UInt8>.Offset(payloadOffsetRaw)
-        let totalSize = Index<UInt8>.Count(__unchecked: payloadOffsetRaw + payloadSize)
-        let alignment = Index<UInt8>.Count(__unchecked: max(headerAlignment, payloadAlignment))
+        let totalSize = Index<UInt8>.Count(__unchecked: (), payloadOffsetRaw + payloadSize)
+        let alignment = Index<UInt8>.Count(__unchecked: (), max(headerAlignment, payloadAlignment))
 
         let ptr = unsafe Memory.Address.Mutable.allocate(
-            byteCount: totalSize,
+            count: totalSize,
             alignment: alignment
         )
 
         // Store header at start (includes payloadOffset for destroy)
-        let headerPtr = unsafe ptr.assumingMemoryBound(to: Header.self)
+        let headerPtr = unsafe ptr.assuming.bound(to: Header.self)
         unsafe headerPtr.initialize(
             to: Header(
                 destroyPayload: { base, offset in
-                    unsafe base.advanced(by: offset).assumingMemoryBound(to: Result<T, E>.self)
+                    unsafe base.advanced(by: offset).assuming.bound(to: Result<T, E>.self)
                         .deinitialize(count: 1)
                 },
                 payloadOffset: payloadOffset
@@ -136,7 +136,7 @@ extension Reference.Transfer.Box {
         )
 
         // Store payload at aligned offset
-        let payloadPtr = unsafe ptr.advanced(by: payloadOffset).assumingMemoryBound(to: Result<T, E>.self)
+        let payloadPtr = unsafe ptr.advanced(by: payloadOffset).assuming.bound(to: Result<T, E>.self)
         unsafe payloadPtr.initialize(to: result)
 
         return unsafe ptr
@@ -149,9 +149,9 @@ extension Reference.Transfer.Box {
     public static func take<T: Sendable, E: Swift.Error & Sendable>(
         _ ptr: Memory.Address.Mutable
     ) -> Result<T, E> {
-        let headerPtr = unsafe ptr.assumingMemoryBound(to: Header.self)
+        let headerPtr = unsafe ptr.assuming.bound(to: Header.self)
         let header = unsafe headerPtr.move()  // releases closure
-        let payloadPtr = unsafe (ptr + header.payloadOffset).assumingMemoryBound(to: Result<T, E>.self)
+        let payloadPtr = unsafe (ptr + header.payloadOffset).assuming.bound(to: Result<T, E>.self)
         let result = unsafe payloadPtr.move()
         // Single deallocation for entire box
         unsafe ptr.deallocate()
@@ -182,20 +182,20 @@ extension Reference.Transfer.Box {
         // Align payload offset properly
         let payloadOffsetRaw = (headerSize + payloadAlignment - 1) & ~(payloadAlignment - 1)
         let payloadOffset = Index<UInt8>.Offset(payloadOffsetRaw)
-        let totalSize = Index<UInt8>.Count(__unchecked: payloadOffsetRaw + payloadSize)
-        let alignment = Index<UInt8>.Count(__unchecked: max(headerAlignment, payloadAlignment))
+        let totalSize = Index<UInt8>.Count(__unchecked: (), payloadOffsetRaw + payloadSize)
+        let alignment = Index<UInt8>.Count(__unchecked: (), max(headerAlignment, payloadAlignment))
 
         let ptr = unsafe Memory.Address.Mutable.allocate(
-            byteCount: totalSize,
+            count: totalSize,
             alignment: alignment
         )
 
         // Store header at start (includes payloadOffset for destroy)
-        let headerPtr = unsafe ptr.assumingMemoryBound(to: Header.self)
+        let headerPtr = unsafe ptr.assuming.bound(to: Header.self)
         unsafe headerPtr.initialize(
             to: Header(
                 destroyPayload: { base, offset in
-                    unsafe (base + offset).assumingMemoryBound(to: T.self)
+                    unsafe (base + offset).assuming.bound(to: T.self)
                         .deinitialize(count: 1)
                 },
                 payloadOffset: payloadOffset
@@ -203,7 +203,7 @@ extension Reference.Transfer.Box {
         )
 
         // Store payload at aligned offset
-        let payloadPtr = unsafe (ptr + payloadOffset).assumingMemoryBound(to: T.self)
+        let payloadPtr = unsafe (ptr + payloadOffset).assuming.bound(to: T.self)
         unsafe payloadPtr.initialize(to: value)
 
         return unsafe ptr
@@ -216,9 +216,9 @@ extension Reference.Transfer.Box {
     public static func takeValue<T: Sendable>(
         _ ptr: Memory.Address.Mutable
     ) -> T {
-        let headerPtr = unsafe ptr.assumingMemoryBound(to: Header.self)
+        let headerPtr = unsafe ptr.assuming.bound(to: Header.self)
         let header = unsafe headerPtr.move()  // releases closure
-        let payloadPtr = unsafe (ptr + header.payloadOffset).assumingMemoryBound(to: T.self)
+        let payloadPtr = unsafe (ptr + header.payloadOffset).assuming.bound(to: T.self)
         let result = unsafe payloadPtr.move()
         // Single deallocation for entire box
         unsafe ptr.deallocate()
@@ -237,7 +237,7 @@ extension Reference.Transfer.Box {
     /// - Important: Uses `move()` on Header before deallocate to properly
     ///   release the closure and balance the initialization from `make()`.
     public static func destroy(_ ptr: Memory.Address.Mutable) {
-        let headerPtr = unsafe ptr.assumingMemoryBound(to: Header.self)
+        let headerPtr = unsafe ptr.assuming.bound(to: Header.self)
         let header = unsafe headerPtr.move()  // releases closure
         unsafe header.destroyPayload(ptr, header.payloadOffset)
         // Single deallocation for entire box

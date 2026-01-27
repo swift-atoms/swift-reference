@@ -116,7 +116,7 @@ extension Reference {
         /// Storage is preallocated but uninitialized.
         public init() {
             _state = Atomic(State.empty)
-            unsafe _storage = .allocate(capacity: Index<Value>.Count(__unchecked: 1))
+            unsafe _storage = .allocate(capacity: Index<Value>.Count(__unchecked: (), 1))
         }
 
         /// Creates a slot containing the given value.
@@ -124,7 +124,7 @@ extension Reference {
         /// - Parameter value: The value to store (ownership transferred).
         public init(_ value: consuming Value) {
             _state = Atomic(State.initializing)
-            unsafe _storage = .allocate(capacity: Index<Value>.Count(__unchecked: 1))
+            unsafe _storage = .allocate(capacity: Index<Value>.Count(__unchecked: (), 1))
             unsafe _storage.initialize(to: value)
             _state.store(State.full, ordering: .releasing)
         }
@@ -132,7 +132,7 @@ extension Reference {
         deinit {
             let prior = _state.exchange(State.empty, ordering: .acquiringAndReleasing)
             if prior == State.full {
-                _ = unsafe _storage.deinitialize(count: Index<Value>.Count(__unchecked: 1))
+                _ = unsafe _storage.deinitialize(count: Index<Value>.Count(__unchecked: (), 1))
             }
             // State.initializing at deinit indicates a logic bug (store in progress
             // when object deallocated). In release builds we treat as empty.
