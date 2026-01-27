@@ -17,15 +17,9 @@ let package = Package(
             targets: ["Reference Primitives"]
         ),
     ],
-    dependencies: [
-        .package(path: "../swift-ownership-primitives"),
-    ],
     targets: [
         .target(
             name: "Reference Primitives",
-            dependencies: [
-                .product(name: "Ownership Primitives", package: "swift-ownership-primitives"),
-            ],
             swiftSettings: [
                 .strictMemorySafety()
             ]

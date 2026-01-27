@@ -12,20 +12,8 @@
 
 /// Re-export policy for Reference Primitives.
 ///
-/// Reference Primitives re-exports Ownership Primitives, which re-exports
-/// Pointer Primitives, which in turn re-exports:
-/// - Memory Primitives
-/// - Index Primitives
-/// - Range Primitives
-/// - Identity Primitives
-/// - Hash Primitives
-/// - Comparison Primitives
-/// - Equation Primitives
-/// - Ordinal Primitives
-/// - Cardinal Primitives
+/// Reference Primitives has no dependencies (Tier 0). It provides pure
+/// non-owning reference types that depend only on Swift's built-in
+/// reference semantics (weak, unowned).
 ///
-/// Downstream packages importing Reference Primitives gain access to this
-/// complete memory/pointer/ownership/reference ecosystem. This is a deliberate
-/// convenience policy.
-
-@_exported import Ownership_Primitives
+/// For owning types, import `Ownership_Primitives` directly.
