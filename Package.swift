@@ -18,13 +18,13 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(path: "../swift-pointer-primitives"),
+        .package(path: "../swift-ownership-primitives"),
     ],
     targets: [
         .target(
             name: "Reference Primitives",
             dependencies: [
-                .product(name: "Pointer Primitives", package: "swift-pointer-primitives"),
+                .product(name: "Ownership Primitives", package: "swift-ownership-primitives"),
             ],
             swiftSettings: [
                 .strictMemorySafety()
