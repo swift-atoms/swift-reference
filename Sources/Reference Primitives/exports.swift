@@ -26,4 +26,4 @@
 /// Downstream packages importing Reference Primitives gain access to this
 /// complete memory/pointer ecosystem. This is a deliberate convenience policy.
 
-public import Pointer_Primitives
+import Pointer_Primitives

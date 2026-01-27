@@ -93,9 +93,9 @@ extension Reference.Transfer {
         @usableFromInline
         init(_ value: consuming T) {
             _state = Atomic(State.initializing)
-            let p = unsafe Pointer<T>.Mutable.allocate(capacity: Index<T>.Count(__unchecked: (), 1))
-            unsafe p.initialize(to: value)
-            unsafe (_storage = p)
+            let p = Pointer<T>.Mutable.allocate(capacity: Index<T>.Count(__unchecked: (), 1))
+            p.initialize(to: value)
+            (_storage = p)
             _state.store(State.full, ordering: .releasing)
         }
 
@@ -103,7 +103,7 @@ extension Reference.Transfer {
         @usableFromInline
         init() {
             _state = Atomic(State.empty)
-            unsafe (_storage = nil)
+            (_storage = nil)
         }
 
         /// Atomically stores a value. Traps if already has a value or already taken.
@@ -124,9 +124,9 @@ extension Reference.Transfer {
             }
 
             // Allocate and initialize
-            let p = unsafe Pointer<T>.Mutable.allocate(capacity: Index<T>.Count(__unchecked: (), 1))
-            unsafe p.initialize(to: value)
-            unsafe (_storage = p)
+            let p = Pointer<T>.Mutable.allocate(capacity: Index<T>.Count(__unchecked: (), 1))
+            p.initialize(to: value)
+            (_storage = p)
 
             // Publish: store full (release ensures init is visible to takers)
             _state.store(State.full, ordering: .releasing)
@@ -149,10 +149,10 @@ extension Reference.Transfer {
                 }
             }
 
-            let p = unsafe _storage!
-            unsafe (_storage = nil)
-            let value = unsafe p.move()
-            unsafe p.deallocate()
+            let p = _storage!
+            (_storage = nil)
+            let value = p.move()
+            p.deallocate()
             return value
         }
 
@@ -169,10 +169,10 @@ extension Reference.Transfer {
                 return nil
             }
 
-            let p = unsafe _storage!
-            unsafe (_storage = nil)
-            let value = unsafe p.move()
-            unsafe p.deallocate()
+            let p = _storage!
+            (_storage = nil)
+            let value = p.move()
+            p.deallocate()
             return value
         }
 
@@ -184,10 +184,10 @@ extension Reference.Transfer {
 
         deinit {
             let state = _state.load(ordering: .acquiring)
-            if state == State.full, let p = unsafe _storage {
+            if state == State.full, let p = _storage {
                 // Value was never taken - clean up to avoid memory leak
-                _ = unsafe p.deinitialize(count: Index<T>.Count(__unchecked: (), 1))
-                unsafe p.deallocate()
+                _ = p.deinitialize(count: Index<T>.Count(__unchecked: (), 1))
+                p.deallocate()
             }
             // State.initializing at deinit indicates a logic bug (store in progress
             // when object deallocated). In release builds we ignore.
