@@ -59,16 +59,16 @@ extension Reference.Unowned {
         /// class SafeParent: Sendable { }
         /// let ref = Reference.Unowned<SafeParent>.Sendable.Checked(parent)
         /// ```
-        public struct Checked<Subject: AnyObject & Swift.Sendable>: Swift.Sendable {
+        public struct Checked: Swift.Sendable where Object: Swift.Sendable {
 
             /// The unowned reference to the object.
-            public unowned let value: Subject
+            public unowned let value: Object
 
             /// Creates a checked-Sendable unowned reference.
             ///
             /// - Parameter value: The object to reference.
             @inlinable
-            public init(_ value: Subject) {
+            public init(_ value: Object) {
                 self.value = value
             }
         }

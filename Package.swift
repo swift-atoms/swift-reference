@@ -19,9 +19,12 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Reference Primitives",
-            swiftSettings: [
-                .strictMemorySafety()
+            name: "Reference Primitives"
+        ),
+        .testTarget(
+            name: "Reference Primitives Tests",
+            dependencies: [
+                "Reference Primitives",
             ]
         ),
     ],
