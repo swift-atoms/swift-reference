@@ -1,4 +1,11 @@
 # Generic Parameter Placement in Reference Semantics Primitives: A Comprehensive Analysis
+<!--
+---
+version: 1.0.0
+last_updated: 2026-01-17
+status: DECISION
+---
+-->
 
 **Technical Design Document**
 **Version 2.0 — Final**
