@@ -10,28 +10,111 @@
 //
 // ===----------------------------------------------------------------------===//
 
-extension Reference {
-    /// An unowned reference wrapper.
-    ///
-    /// Provides explicit unowned reference semantics. Accessing `value`
-    /// after the referenced object is deallocated is undefined behavior.
-    ///
-    /// Use when you guarantee the referenced object outlives this wrapper.
-    ///
-    /// ## Example
-    ///
-    /// ```swift
-    /// class Parent { var children: [Child] = [] }
-    /// class Child { let parent: Reference.Unowned<Parent> }
-    /// ```
-    public struct Unowned<Object: AnyObject>: @unchecked Sendable {
-        /// The unowned reference to the object.
-        public unowned let value: Object
+// `unowned` storage and `AnyObject`-constrained classes require runtime
+// reference-counting metadata unavailable in Embedded Swift.
+#if !hasFeature(Embedded)
 
-        /// Creates an unowned reference to the given object.
-        @inlinable
-        public init(_ value: Object) {
-            self.value = value
+    extension Reference {
+
+        /// An unowned reference wrapper.
+        ///
+        /// Provides explicit unowned reference semantics. Accessing `value`
+        /// after the referenced object is deallocated is undefined behavior.
+        ///
+        /// This type is **not Sendable** by design. It may reference any class
+        /// instance and is intended for local, isolation-confined use only.
+        ///
+        /// To explicitly cross isolation boundaries, use one of:
+        /// - ``Reference.Unowned.Sendable.Checked`` (when `Object: Sendable`)
+        /// - ``Reference.Unowned.Sendable.Unchecked`` (explicit opt-in)
+        ///
+        /// ## Example
+        ///
+        /// ```swift
+        /// class Parent { var children: [Child] = [] }
+        /// class Child { let parent: Reference.Unowned<Parent> }
+        /// ```
+        public struct Unowned<Object: AnyObject> {
+
+            /// The unowned reference to the object.
+            public unowned let value: Object
+
+            /// Creates an unowned reference to the given object.
+            @inlinable
+            public init(_ value: Object) {
+                self.value = value
+            }
         }
     }
-}
+
+    extension Reference.Unowned {
+
+        /// Namespace for Sendable opt-ins.
+        public enum Sendable {
+
+            /// A checked-Sendable unowned reference.
+            ///
+            /// This wrapper is `Sendable` because the referenced object type
+            /// is constrained to `Sendable`. This is fully compiler-checked.
+            ///
+            /// ## Example
+            ///
+            /// ```swift
+            /// class SafeParent: Sendable { }
+            /// let ref = Reference.Unowned<SafeParent>.Sendable.Checked(parent)
+            /// ```
+            public struct Checked: Swift.Sendable where Object: Swift.Sendable {
+
+                /// The unowned reference to the object.
+                public unowned let value: Object
+
+                /// Creates a checked-Sendable unowned reference.
+                ///
+                /// - Parameter value: The object to reference.
+                @inlinable
+                public init(_ value: Object) {
+                    self.value = value
+                }
+            }
+
+            /// An unchecked-Sendable unowned reference.
+            ///
+            /// ## Safety
+            ///
+            /// **This type bypasses the compiler's Sendable checking.**
+            ///
+            /// The caller must ensure the referenced object is not accessed
+            /// concurrently across isolation domains. Failure to do so will
+            /// cause data races.
+            ///
+            /// ## Intended Use Cases
+            ///
+            /// - Actor-confined parent references where the child never escapes
+            /// - Single-threaded contexts with non-Sendable class hierarchies
+            ///
+            /// ## Example
+            ///
+            /// ```swift
+            /// class NonSendableParent { var children: [Child] = [] }
+            /// class Child {
+            ///     // Only valid if Child never escapes the parent's isolation domain
+            ///     let parent: Reference.Unowned<NonSendableParent>.Sendable.Unchecked
+            /// }
+            /// ```
+            public struct Unchecked: @unchecked Swift.Sendable {
+
+                /// The unowned reference to the object.
+                public unowned let value: Object
+
+                /// Creates an unchecked-Sendable unowned reference.
+                ///
+                /// - Parameter value: The object to reference.
+                @inlinable
+                public init(_ value: Object) {
+                    self.value = value
+                }
+            }
+        }
+    }
+
+#endif
