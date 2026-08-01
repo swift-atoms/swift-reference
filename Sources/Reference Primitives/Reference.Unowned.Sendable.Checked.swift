@@ -14,32 +14,27 @@
 // reference-counting metadata unavailable in Embedded Swift.
 #if !hasFeature(Embedded)
 
-    extension Reference {
+    extension Reference.Unowned.Sendable {
 
-        /// An unowned reference wrapper.
+        /// A checked-Sendable unowned reference.
         ///
-        /// Provides explicit unowned reference semantics. Accessing `value`
-        /// after the referenced object is deallocated is undefined behavior.
-        ///
-        /// This type is **not Sendable** by design. It may reference any class
-        /// instance and is intended for local, isolation-confined use only.
-        ///
-        /// To explicitly cross isolation boundaries, use one of:
-        /// - ``Reference.Unowned.Sendable.Checked`` (when `Object: Sendable`)
-        /// - ``Reference.Unowned.Sendable.Unchecked`` (explicit opt-in)
+        /// This wrapper is `Sendable` because the referenced object type
+        /// is constrained to `Sendable`. This is fully compiler-checked.
         ///
         /// ## Example
         ///
         /// ```swift
-        /// class Parent { var children: [Child] = [] }
-        /// class Child { let parent: Reference.Unowned<Parent> }
+        /// class SafeParent: Sendable { }
+        /// let ref = Reference.Unowned<SafeParent>.Sendable.Checked(parent)
         /// ```
-        public struct Unowned<Object: AnyObject> {
+        public struct Checked: Swift.Sendable where Object: Swift.Sendable {
 
             /// The unowned reference to the object.
             public unowned let value: Object
 
-            /// Creates an unowned reference to the given object.
+            /// Creates a checked-Sendable unowned reference.
+            ///
+            /// - Parameter value: The object to reference.
             @inlinable
             public init(_ value: Object) {
                 self.value = value

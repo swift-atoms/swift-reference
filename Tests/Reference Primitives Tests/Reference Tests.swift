@@ -1,14 +1,22 @@
 import Reference_Primitives
 import Testing
 
-@Suite struct ReferencePrimitivesTests {
-    @Test func weakReferenceAcceptsNil() {
+extension Reference {
+    @Suite struct Tests {
+        @Suite struct Unit {}
+        @Suite struct `Edge Case` {}
+        @Suite struct Integration {}
+    }
+}
+
+extension Reference.Tests.Unit {
+    @Test func `weak reference accepts nil`() {
         final class Node: Sendable {}
         let weak = Reference.Weak<Node>(nil)
         #expect(weak.value == nil)
     }
 
-    @Test func unownedReferenceStoresValue() {
+    @Test func `unowned reference stores value`() {
         final class Node: Sendable {
             let name: String
             init(name: String) { self.name = name }
@@ -18,17 +26,21 @@ import Testing
         #expect(ref.value.name == "test")
     }
 
-    @Test func checkedSendableUnownedStoresValue() {
-        final class SafeNode: Sendable {
+    @Test func `checked sendable unowned stores value`() {
+        final class Safe: Sendable {
             let id: Int
             init(id: Int) { self.id = id }
         }
-        let node = SafeNode(id: 1)
-        let ref = Reference.Unowned<SafeNode>.Sendable.Checked(node)
+        let node = Safe(id: 1)
+        let ref = Reference.Unowned<Safe>.Sendable.Checked(node)
         #expect(ref.value.id == 1)
     }
 
-    @Test func uncheckedSendabilityWraps() {
+    @Test func `unchecked sendability wraps`() {
+        // swift-linter:disable:next unchecked call site
+        // REASON: [CONV-001] extension-init internals — `__unchecked:` here exercises
+        // `Reference.Sendability.Unchecked`'s own auditable assertion-site initializer,
+        // the typed-system bottom-out this call is testing.
         let wrapped = Reference.Sendability.Unchecked(__unchecked: 42)
         #expect(wrapped.value == 42)
     }

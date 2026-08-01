@@ -47,6 +47,14 @@ extension Reference.Sendability {
     ///     values[keyPath: kp.value] = mockClient
     /// }
     /// ```
+    // swift-linter:disable:next unchecked sendable noncopyable
+    // REASON: `Value` is an unconstrained `~Copyable` generic parameter, not a
+    // concrete stored-property set the checker can prove Sendable — this is the
+    // auditable escape hatch itself, not a compiler-limitation workaround, so no
+    // revalidation anchor applies.
+    // swift-linter:disable:next unchecked sendable revalidation anchor
+    // REASON: not compiler-limitation-justified; see REASON above — this is a
+    // permanent, deliberate audit boundary for wrapping arbitrary values.
     public struct Unchecked<Value: ~Copyable>: ~Copyable, @unchecked Swift.Sendable {
         /// The wrapped value.
         public let value: Value
