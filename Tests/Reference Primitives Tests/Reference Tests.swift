@@ -37,10 +37,7 @@ extension Reference.Tests.Unit {
     }
 
     @Test func `unchecked sendability wraps`() {
-        // swift-linter:disable:next unchecked call site
-        // REASON: [CONV-001] extension-init internals — `__unchecked:` here exercises
-        // `Reference.Sendability.Unchecked`'s own auditable assertion-site initializer,
-        // the typed-system bottom-out this call is testing.
+
         let wrapped = Reference.Sendability.Unchecked(__unchecked: 42)
         #expect(wrapped.value == 42)
     }

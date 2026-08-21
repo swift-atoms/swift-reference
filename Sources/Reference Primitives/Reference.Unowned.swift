@@ -1,45 +1,11 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2025 Coen ten Thije Boonkkamp and the swift-primitives
-// project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
-// `unowned` storage and `AnyObject`-constrained classes require runtime
-// reference-counting metadata unavailable in Embedded Swift.
 #if !hasFeature(Embedded)
 
     extension Reference {
 
-        /// An unowned reference wrapper.
-        ///
-        /// Provides explicit unowned reference semantics. Accessing `value`
-        /// after the referenced object is deallocated is undefined behavior.
-        ///
-        /// This type is **not Sendable** by design. It may reference any class
-        /// instance and is intended for local, isolation-confined use only.
-        ///
-        /// To explicitly cross isolation boundaries, use one of:
-        /// - ``Reference.Unowned.Sendable.Checked`` (when `Object: Sendable`)
-        /// - ``Reference.Unowned.Sendable.Unchecked`` (explicit opt-in)
-        ///
-        /// ## Example
-        ///
-        /// ```swift
-        /// class Parent { var children: [Child] = [] }
-        /// class Child { let parent: Reference.Unowned<Parent> }
-        /// ```
         public struct Unowned<Object: AnyObject> {
 
-            /// The unowned reference to the object.
             public unowned let value: Object
 
-            /// Creates an unowned reference to the given object.
             @inlinable
             public init(_ value: Object) {
                 self.value = value
