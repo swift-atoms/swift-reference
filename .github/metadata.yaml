@@ -2,7 +2,7 @@
 # Triaged by AI-assisted bulk pass (2026-04-29).
 description: "Non-owning weak and unowned reference wrappers with an auditable, greppable Sendable escape hatch for Swift."
 topics:
-  - primitives
+  - molecules
   - reference
 homepage: "https://swift-institute.org"
 readme:

@@ -1,4 +1,4 @@
-# Reference Primitives
+# Reference
 
 ![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
 
@@ -11,7 +11,7 @@ Non-owning reference types for Swift — weak and unowned wrappers, plus auditab
 `Reference` is a namespace for types that refer to objects **without owning them**. They do not participate in the lifetime of what they point at, which makes them the building blocks for back-references and parent pointers that would otherwise create retain cycles.
 
 ```swift
-import Reference_Primitives
+import Reference
 
 final class Node: Sendable { let name: String; init(name: String) { self.name = name } }
 let node = Node(name: "root")
@@ -44,7 +44,7 @@ print(wrapped.value)      // 42
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-primitives/swift-reference-primitives.git", branch: "main")
+    .package(url: "https://github.com/swift-molecules/swift-reference.git", branch: "main")
 ]
 ```
 
@@ -52,7 +52,7 @@ dependencies: [
 .target(
     name: "App",
     dependencies: [
-        .product(name: "Reference Primitives", package: "swift-reference-primitives"),
+        .product(name: "Reference", package: "swift-reference"),
     ]
 )
 ```
@@ -67,10 +67,10 @@ Two library products, zero external dependencies.
 
 | Product | Target | Purpose |
 |---------|--------|---------|
-| `Reference Primitives` | `Sources/Reference Primitives/` | The `Reference` namespace: `Reference.Weak` (zeroing weak), `Reference.Unowned` (unsafe unowned) with `.Sendable.Checked` / `.Sendable.Unchecked` opt-ins, and `Reference.Sendability.Unchecked` (an auditable `@unchecked Sendable` wrapper). |
-| `Reference Primitives Test Support` | `Tests/Support/` | Re-exports the main target for test consumers. |
+| `Reference` | `Sources/Reference/` | The `Reference` namespace: `Reference.Weak` (zeroing weak), `Reference.Unowned` (unsafe unowned) with `.Sendable.Checked` / `.Sendable.Unchecked` opt-ins, and `Reference.Sendability.Unchecked` (an auditable `@unchecked Sendable` wrapper). |
+| `Reference Test Support` | `Tests/Support/` | Re-exports the main target for test consumers. |
 
-For types that **own** their values—unique, shared, and slot ownership—import `Ownership_Primitives`.
+For types that **own** their values—unique, shared, and slot ownership—import `Ownership`.
 
 Foundation-free.
 

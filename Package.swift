@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-reference-primitives",
+    name: "swift-reference",
     platforms: [
         .macOS(.v27),
         .iOS(.v27),
@@ -13,30 +13,30 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "Reference Primitives",
-            targets: ["Reference Primitives"]
+            name: "Reference",
+            targets: ["Reference"]
         ),
         .library(
-            name: "Reference Primitives Test Support",
-            targets: ["Reference Primitives Test Support"]
+            name: "Reference Test Support",
+            targets: ["Reference Test Support"]
         ),
     ],
     targets: [
         .target(
-            name: "Reference Primitives"
+            name: "Reference"
         ),
         .target(
-            name: "Reference Primitives Test Support",
+            name: "Reference Test Support",
             dependencies: [
-                "Reference Primitives"
+                "Reference"
             ],
             path: "Tests/Support"
         ),
         .testTarget(
-            name: "Reference Primitives Tests",
+            name: "Reference Tests",
             dependencies: [
-                "Reference Primitives",
-                "Reference Primitives Test Support",
+                "Reference",
+                "Reference Test Support",
             ]
         ),
     ],
