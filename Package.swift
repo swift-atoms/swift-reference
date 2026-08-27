@@ -17,27 +17,35 @@ let package = Package(
             targets: ["Reference"]
         ),
         .library(
-            name: "Reference Test Support",
-            targets: ["Reference Test Support"]
+            name: "Reference Standard Library Integration",
+            targets: ["Reference Standard Library Integration"]
+        ),
+        .library(
+            name: "Reference Apple Foundation Integration",
+            targets: ["Reference Apple Foundation Integration"]
         ),
     ],
+    dependencies: [],
     targets: [
         .target(
-            name: "Reference"
+            name: "Reference",
+            dependencies: []
         ),
         .target(
-            name: "Reference Test Support",
+            name: "Reference Standard Library Integration",
+            dependencies: ["Reference"]
+        ),
+        .target(
+            name: "Reference Apple Foundation Integration",
             dependencies: [
-                "Reference"
-            ],
-            path: "Tests/Support"
+                "Reference",
+                "Reference Standard Library Integration",
+            ]
         ),
         .testTarget(
             name: "Reference Tests",
-            dependencies: [
-                "Reference",
-                "Reference Test Support",
-            ]
+            dependencies: ["Reference"],
+            path: "Tests/Reference Tests"
         ),
     ],
     swiftLanguageModes: [.v6]
