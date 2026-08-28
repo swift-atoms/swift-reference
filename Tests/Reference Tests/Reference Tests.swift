@@ -1,4 +1,4 @@
-import Reference_Primitives
+import Reference
 import Testing
 
 extension Reference {
