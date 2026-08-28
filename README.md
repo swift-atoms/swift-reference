@@ -44,7 +44,7 @@ print(wrapped.value)      // 42
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-molecules/swift-reference.git", branch: "main")
+    .package(url: "https://github.com/swift-atoms/swift-reference.git", branch: "main")
 ]
 ```
 
@@ -63,12 +63,11 @@ Requires Swift 6.3.1 and macOS 26 / iOS 26 / tvOS 26 / watchOS 26 / visionOS 26 
 
 ## Architecture
 
-Two library products, zero external dependencies.
+One library product, zero external dependencies.
 
 | Product | Target | Purpose |
 |---------|--------|---------|
 | `Reference` | `Sources/Reference/` | The `Reference` namespace: `Reference.Weak` (zeroing weak), `Reference.Unowned` (unsafe unowned) with `.Sendable.Checked` / `.Sendable.Unchecked` opt-ins, and `Reference.Sendability.Unchecked` (an auditable `@unchecked Sendable` wrapper). |
-| `Reference Test Support` | `Tests/Support/` | Re-exports the main target for test consumers. |
 
 For types that **own** their values—unique, shared, and slot ownership—import `Ownership`.
 

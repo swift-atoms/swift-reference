@@ -16,27 +16,15 @@ let package = Package(
             name: "Reference",
             targets: ["Reference"]
         ),
-        .library(
-            name: "Reference Test Support",
-            targets: ["Reference Test Support"]
-        ),
     ],
     targets: [
         .target(
             name: "Reference"
         ),
-        .target(
-            name: "Reference Test Support",
-            dependencies: [
-                "Reference"
-            ],
-            path: "Tests/Support"
-        ),
         .testTarget(
             name: "Reference Tests",
             dependencies: [
-                "Reference",
-                "Reference Test Support",
+                .target(name: "Reference"),
             ]
         ),
     ],
