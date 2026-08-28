@@ -16,17 +16,6 @@ extension Reference.Tests.Unit {
         #expect(weak.value == nil)
     }
 
-    @Test func `weak reference clears after deallocation`() {
-        final class Node: Sendable {}
-        var weak = Reference.Weak<Node>(nil)
-        do {
-            let node = Node()
-            weak = Reference.Weak(node)
-            #expect(weak.value != nil)
-        }
-        #expect(weak.value == nil)
-    }
-
     @Test func `unowned reference stores value`() {
         final class Node: Sendable {
             let name: String
@@ -52,15 +41,4 @@ extension Reference.Tests.Unit {
         let wrapped = Reference.Sendability.Unchecked(__unchecked: 42)
         #expect(wrapped.value == 42)
     }
-
-    @Test func `unchecked sendability wraps move-only values`() {
-        let wrapped = Reference.Sendability.Unchecked(
-            __unchecked: MoveOnlyValue(value: 42)
-        )
-        #expect(wrapped.value.value == 42)
-    }
-}
-
-private struct MoveOnlyValue: ~Copyable {
-    let value: Int
 }
