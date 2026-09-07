@@ -13,8 +13,8 @@ let package = Package(
     ],
     products: [
         .library(name: "Reference", targets: ["Reference"]),
-        .library(name: "Reference Standard Library Integration", targets: ["Reference Standard Library Integration"]),
-        .library(name: "Reference Foundation Library Integration", targets: ["Reference Foundation Library Integration"]),
+
+        .library(name: "Reference Foundation Integration", targets: ["Reference Foundation Integration"]),
         .library(name: "Reference Test Support", targets: ["Reference Test Support"]),
     ],
     dependencies: [],
@@ -25,20 +25,13 @@ let package = Package(
             ],
             path: "Sources/Reference"
         ),
+        
         .target(
-            name: "Reference Standard Library Integration",
+            name: "Reference Foundation Integration",
             dependencies: [
                 .target(name: "Reference"),
             ],
-            path: "Sources/Reference Standard Library Integration"
-        ),
-        .target(
-            name: "Reference Foundation Library Integration",
-            dependencies: [
-                .target(name: "Reference"),
-                .target(name: "Reference Standard Library Integration"),
-            ],
-            path: "Sources/Reference Foundation Library Integration"
+            path: "Sources/Reference Foundation Integration"
         ),
         .target(
             name: "Reference Test Support",
@@ -52,8 +45,7 @@ let package = Package(
             dependencies: [
                 .target(name: "Reference"),
                 .target(name: "Reference Test Support"),
-                .target(name: "Reference Standard Library Integration"),
-                .target(name: "Reference Foundation Library Integration"),
+                .target(name: "Reference Foundation Integration"),
             ],
             path: "Tests/Reference Tests"
         ),

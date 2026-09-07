@@ -1,6 +1,5 @@
 #if !hasFeature(Embedded)
-
-    extension Reference.Unowned.Sendable {
+extension Reference.Unowned.Sendable {
 
         public struct Unchecked: @unchecked Swift.Sendable {
 
@@ -12,5 +11,4 @@
             }
         }
     }
-
 #endif

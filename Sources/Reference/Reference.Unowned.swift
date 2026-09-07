@@ -1,6 +1,5 @@
 #if !hasFeature(Embedded)
-
-    extension Reference {
+extension Reference {
 
         public struct Unowned<Object: AnyObject> {
 
@@ -12,5 +11,4 @@
             }
         }
     }
-
 #endif
