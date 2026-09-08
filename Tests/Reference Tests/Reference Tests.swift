@@ -2,14 +2,14 @@ import Reference
 import Testing
 
 extension Reference {
-    @Suite struct `Behavior contracts` {
-        @Suite struct `Unit behavior` {}
-        @Suite struct `Edge Case` {}
-        @Suite struct `Integration behavior` {}
+    @Suite struct `Reference wrappers preserve weak and unowned value access` {
+        @Suite struct `Reference construction preserves nil values stored objects and wrapper access` {}
+        @Suite struct `No reference wrapper boundary cases are defined` {}
+        @Suite struct `No reference wrapper integration cases are defined` {}
     }
 }
 
-extension Reference.`Behavior contracts`.`Unit behavior` {
+extension Reference.`Reference wrappers preserve weak and unowned value access`.`Reference construction preserves nil values stored objects and wrapper access` {
     @Test func `weak reference accepts nil`() {
         final class Node: Sendable {}
         let weak = Reference.Weak<Node>(nil)
@@ -44,7 +44,7 @@ extension Reference.`Behavior contracts`.`Unit behavior` {
 }
 
 @Suite
-struct `Reference lifetime and sendability` {
+struct `References preserve lifetime behavior and declared transfer capabilities` {
     @Test
     func `weak references become nil when the final strong owner is released`() {
         final class Node: Sendable {}
