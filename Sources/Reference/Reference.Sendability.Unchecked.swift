@@ -1,6 +1,6 @@
 extension Reference.Sendability {
 
-    public struct Unchecked<Value: ~Copyable>: ~Copyable, @unchecked Swift.Sendable {
+    public struct Unchecked<Value: ~Copyable>: ~Copyable, @unchecked Swift::Sendable {
 
         public let value: Value
 

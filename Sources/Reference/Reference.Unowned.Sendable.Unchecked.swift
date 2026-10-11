@@ -1,7 +1,7 @@
 #if !hasFeature(Embedded)
 extension Reference.Unowned.Sendable {
 
-        public struct Unchecked: @unchecked Swift.Sendable {
+        public struct Unchecked: @unchecked Swift::Sendable {
 
             public unowned let value: Object
 
