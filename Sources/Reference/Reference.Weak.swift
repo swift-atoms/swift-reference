@@ -1,5 +1,5 @@
 #if !hasFeature(Embedded)
-extension Reference {
+    extension Reference {
 
         public struct Weak<Object: AnyObject>: Sendable where Object: Sendable {
 

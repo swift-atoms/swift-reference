@@ -1,2 +1,2 @@
-@_exported public import Reference
 import Foundation
+@_exported public import Reference

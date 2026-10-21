@@ -1,5 +1,5 @@
 #if !hasFeature(Embedded)
-extension Reference.Unowned {
+    extension Reference.Unowned {
 
         public enum Sendable {}
     }
