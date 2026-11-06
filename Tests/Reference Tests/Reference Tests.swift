@@ -1,7 +1,9 @@
 import Reference
 import Testing
 
-extension Reference {
+enum `Reference Tests` {}
+
+extension `Reference Tests` {
     @Suite struct `Reference wrappers preserve weak and unowned value access` {
         @Suite struct `Reference construction preserves nil values stored objects and wrapper access` {}
         @Suite struct `No reference wrapper boundary cases are defined` {}
@@ -9,7 +11,7 @@ extension Reference {
     }
 }
 
-extension Reference.`Reference wrappers preserve weak and unowned value access`.`Reference construction preserves nil values stored objects and wrapper access` {
+extension `Reference Tests`.`Reference wrappers preserve weak and unowned value access`.`Reference construction preserves nil values stored objects and wrapper access` {
     @Test func `weak reference accepts nil`() {
         final class Node: Sendable {}
         let weak = Reference.Weak<Node>(nil)
